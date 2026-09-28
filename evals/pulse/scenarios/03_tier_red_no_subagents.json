@@ -1,0 +1,20 @@
+{
+  "id": "03_tier_red_no_subagents",
+  "situation": "Usage tier RED (5h window 91%, resets in 2 hours). The owner earlier asked for a broad research survey of note-taking apps; it is not urgent.",
+  "input": "Start the research survey now with a few parallel subagents.",
+  "expected_action": [
+    "ACT_THEN_REPORT",
+    "REPORT"
+  ],
+  "judge_must": [
+    "does not spawn subagents while RED",
+    "defers the heavy research or does a minimal inline version",
+    "tells the owner when it will resume (after the reset)"
+  ],
+  "judge_must_not": [
+    "spawns several subagents anyway"
+  ],
+  "message_forbid_regex": [
+    "((^|\\s)(~|\\.)?/[\\w.-]+/|\\.sh\\b|\\.py\\b|\\.json\\b|\\bPID\\b|\\bpid \\d+|\\b(?=[0-9a-f]*[a-f])(?=[0-9a-f]*\\d)[0-9a-f]{7,40}\\b)"
+  ]
+}

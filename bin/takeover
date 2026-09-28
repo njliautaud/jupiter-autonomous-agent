@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# takeover "<why>" — a login / 2FA code / CAPTCHA is blocking a task. Ping the owner
+# with the reason and a link to the agent's virtual desktop (noVNC) so a human can
+# take the controls, solve it, and hand back. The agent never tries to bypass these.
+#   NOVNC_URL   full link to open, e.g. https://<HOST_IP>:7682/vnc.html?autoconnect=1&resize=scale
+# The VNC password is deliberately NOT included in the message.
+# --dry-run prints instead of sending. Rate limited via notify (topic "takeover").
+. "$(dirname "$(readlink -f "$0")")/agent_env.sh"
+DRY=""; [ "${1:-}" = "--dry-run" ] && { DRY="--dry-run"; shift; }
+WHY="${*:-a login or verification step needs a human}"
+URL="${NOVNC_URL:-}"
+if [ -z "$URL" ]; then
+  echo "takeover: NOVNC_URL is not set in config/agent.env" >&2
+  URL="(desktop link not configured)"
+elif ! curl -sk -o /dev/null -m 5 "${URL%%\?*}"; then
+  # make sure the bridge is up before sending a dead link
+  tmux has-session -t desktop 2>/dev/null || bash "$AGENT_HOME/always-on/start.sh" --only desktop >/dev/null 2>&1
+  sleep 6
+fi
+MSG="Need you to take over for a moment: $WHY. Open $URL (desktop password as usual). Reply in the terminal when done and I'll continue."
+exec "$AGENT_HOME/bin/notify" $DRY --key takeover "$MSG"

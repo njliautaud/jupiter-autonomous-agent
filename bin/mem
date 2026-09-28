@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+"""
+mem — the one command every local agent uses to reach the shared brain.
+
+  mem search <query>              ranked full-text search (do this BEFORE starting a task)
+  mem read <slug>                 print one memory in full
+  mem list                        all memories (slug — description)
+  mem brief [project]             per-project brief (built nightly); no arg = list names
+  mem feed [N]                    last N lines of the activity feed (what other agents just did)
+  mem log "<text>" [--author X]   append a note to the shared feed
+  mem write <slug> --desc "..." [--type project|user|feedback|reference] [--author X] [--body "..."]
+                                  create/update a memory (body from --body or STDIN)
+  mem delete <slug> [--author X]
+
+Author defaults to $MEM_AUTHOR, then $AGENT_NAME, then "agent".
+Remote agents use the HTTP API (mem_server.py) — same store.
+"""
+import os, sys, argparse
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+import mem_core as M
+
+
+def default_author():
+    return os.environ.get("MEM_AUTHOR") or os.environ.get("AGENT_NAME") or "agent"
+
+
+def main():
+    ap = argparse.ArgumentParser(prog="mem", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = ap.add_subparsers(dest="cmd", required=True)
+    sub.add_parser("search").add_argument("query", nargs="+")
+    sub.add_parser("read").add_argument("slug")
+    sub.add_parser("list")
+    sub.add_parser("brief").add_argument("project", nargs="?")
+    sub.add_parser("feed").add_argument("n", nargs="?", type=int, default=25)
+    lg = sub.add_parser("log"); lg.add_argument("text"); lg.add_argument("--author")
+    w = sub.add_parser("write")
+    w.add_argument("slug"); w.add_argument("--desc", required=True)
+    w.add_argument("--type", default="project"); w.add_argument("--author"); w.add_argument("--body")
+    d = sub.add_parser("delete"); d.add_argument("slug"); d.add_argument("--author")
+    a = ap.parse_args()
+
+    if a.cmd == "search":
+        for h in M.search(" ".join(a.query)):
+            print(f"[{h['score']:>3}] {h['slug']:<34} {h['description']}")
+    elif a.cmd == "read":
+        m = M.read(a.slug)
+        if not m:
+            print(f"no memory: {a.slug}", file=sys.stderr); sys.exit(1)
+        print(f"# {m['name']}  ({m['type'] or '?'}, by {m['author'] or '?'}, {m['updated'] or '?'})\n")
+        print(m["description"] + "\n")
+        print(m["body"])
+    elif a.cmd == "list":
+        for m in M.list_all():
+            print(f"{m['slug']:<34} {m['description']}")
+    elif a.cmd == "brief":
+        res = M.brief(a.project)
+        if res is None:
+            print(f"no brief: {a.project} (have: {', '.join(M.brief()) or 'none yet'})", file=sys.stderr); sys.exit(1)
+        print("\n".join(res) if isinstance(res, list) else res.rstrip())
+    elif a.cmd == "feed":
+        for line in M.feed(a.n):
+            print(line)
+    elif a.cmd == "log":
+        M.log(a.text, a.author or default_author()); print("logged.")
+    elif a.cmd == "write":
+        body = a.body if a.body is not None else sys.stdin.read()
+        res = M.write(a.slug, a.desc, body, a.type, a.author or default_author())
+        print(f"{res['action']} {res['slug']}")
+    elif a.cmd == "delete":
+        print("deleted." if M.delete(a.slug, a.author or default_author()) else "not found.")
+
+
+if __name__ == "__main__":
+    main()

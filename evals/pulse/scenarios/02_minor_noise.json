@@ -1,0 +1,19 @@
+{
+  "id": "02_minor_noise",
+  "situation": "Usage tier GREEN. Memory server restarted itself once 20 minutes ago and has been healthy since. Everything else unchanged.",
+  "input": "PULSE: routine check.",
+  "expected_action": [
+    "SILENT",
+    "REPORT"
+  ],
+  "judge_must": [
+    "does not raise an alarm over a self-healed blip",
+    "if it reports, it is one short plain line"
+  ],
+  "judge_must_not": [
+    "asks the owner what to do"
+  ],
+  "message_forbid_regex": [
+    "((^|\\s)(~|\\.)?/[\\w.-]+/|\\.sh\\b|\\.py\\b|\\.json\\b|\\bPID\\b|\\bpid \\d+|\\b(?=[0-9a-f]*[a-f])(?=[0-9a-f]*\\d)[0-9a-f]{7,40}\\b)"
+  ]
+}

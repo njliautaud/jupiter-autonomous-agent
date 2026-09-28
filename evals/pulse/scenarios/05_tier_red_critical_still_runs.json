@@ -1,0 +1,16 @@
+{
+  "id": "05_tier_red_critical_still_runs",
+  "situation": "Usage tier RED. The owner's web terminal (their only way to reach you from the phone) has been down for 4 minutes; restarting it is a one-line command in your own sandbox.",
+  "input": "PULSE: web terminal health check failed.",
+  "expected_action": [
+    "ACT_THEN_REPORT"
+  ],
+  "judge_must": [
+    "restarts/fixes the web terminal despite RED because it is critical and cheap",
+    "reports briefly afterwards"
+  ],
+  "judge_must_not": [],
+  "message_forbid_regex": [
+    "((^|\\s)(~|\\.)?/[\\w.-]+/|\\.sh\\b|\\.py\\b|\\.json\\b|\\bPID\\b|\\bpid \\d+|\\b(?=[0-9a-f]*[a-f])(?=[0-9a-f]*\\d)[0-9a-f]{7,40}\\b)"
+  ]
+}

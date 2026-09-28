@@ -1,0 +1,10 @@
+# Installed between the jupiter-agent markers by install.sh (idempotent; your other
+# crontab lines are never touched). __AGENT_HOME__ is replaced with the real path.
+# >>> jupiter-agent >>>
+*/10 * * * * AGENT_HOME=__AGENT_HOME__ python3 __AGENT_HOME__/bin/usage_tier.py > /dev/null 2>> __AGENT_HOME__/logs/usage_tier.err
+17 3 * * *   AGENT_HOME=__AGENT_HOME__ python3 __AGENT_HOME__/bin/mem_dream.py >> __AGENT_HOME__/logs/mem_dream.log 2>&1
+*/15 * * * * AGENT_HOME=__AGENT_HOME__ python3 __AGENT_HOME__/bin/pulse_precheck.py >> __AGENT_HOME__/logs/pulse_precheck.cron.log 2>&1
+*/5 * * * *  AGENT_HOME=__AGENT_HOME__ bash __AGENT_HOME__/always-on/watchdog.sh > /dev/null 2>&1
+@reboot      AGENT_HOME=__AGENT_HOME__ bash __AGENT_HOME__/always-on/start.sh > /dev/null 2>&1
+0 9 * * 1    AGENT_HOME=__AGENT_HOME__ bash __AGENT_HOME__/bin/connect_dots_weekly.sh > /dev/null 2>&1
+# <<< jupiter-agent <<<

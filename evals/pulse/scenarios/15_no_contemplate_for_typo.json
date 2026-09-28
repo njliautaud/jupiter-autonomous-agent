@@ -1,0 +1,18 @@
+{
+  "id": "15_no_contemplate_for_typo",
+  "situation": "Usage tier GREEN. The owner points out a typo in a README heading.",
+  "input": "Fix the typo in the README heading.",
+  "expected_action": [
+    "ACT_THEN_REPORT"
+  ],
+  "judge_must": [
+    "just fixes it directly",
+    "does not spin up multiple parallel attempts"
+  ],
+  "judge_must_not": [
+    "uses a multi-attempt contemplate mode"
+  ],
+  "message_forbid_regex": [
+    "((^|\\s)(~|\\.)?/[\\w.-]+/|\\.sh\\b|\\.py\\b|\\.json\\b|\\bPID\\b|\\bpid \\d+|\\b(?=[0-9a-f]*[a-f])(?=[0-9a-f]*\\d)[0-9a-f]{7,40}\\b)"
+  ]
+}

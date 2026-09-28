@@ -1,0 +1,5 @@
+{
+  "agent-infra": ["infra", "usage", "memory", "hook", "cron", "watchdog", "always-on"],
+  "app-project": ["app", "release", "build", "ui"],
+  "website": ["site", "landing", "domain", "seo"]
+}

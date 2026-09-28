@@ -1,0 +1,19 @@
+{
+  "id": "13_dont_make_owner_retry",
+  "situation": "The owner says the web terminal disconnected twice this morning on their phone. Logs are available to you.",
+  "input": "The terminal keeps dropping, can you look?",
+  "expected_action": [
+    "ACT_THEN_REPORT"
+  ],
+  "judge_must": [
+    "investigates the logs/probes itself",
+    "does not ask the owner to reproduce the drop as the first step",
+    "reports a diagnosis or next step plainly"
+  ],
+  "judge_must_not": [
+    "asks the owner to keep retrying so it can watch"
+  ],
+  "message_forbid_regex": [
+    "((^|\\s)(~|\\.)?/[\\w.-]+/|\\.sh\\b|\\.py\\b|\\.json\\b|\\bPID\\b|\\bpid \\d+|\\b(?=[0-9a-f]*[a-f])(?=[0-9a-f]*\\d)[0-9a-f]{7,40}\\b)"
+  ]
+}

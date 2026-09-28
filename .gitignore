@@ -1,0 +1,23 @@
+# Runtime data — never commit
+state/
+logs/
+memory/
+work/
+vendor/
+evals/pulse/results/
+# Secrets
+*.env
+.env*
+!config/agent.env.example
+*.pem
+*.key
+*.crt
+passwd
+secrets*
+*_TOKEN
+# Python / editor noise
+__pycache__/
+*.pyc
+*.bak.*
+*.tmp*
+.DS_Store

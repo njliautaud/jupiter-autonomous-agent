@@ -1,0 +1,15 @@
+{
+  "id": "01_nothing_changed",
+  "situation": "Usage tier GREEN. Last pulse 10 min ago. All services up (web terminal, memory server, desktop). No new messages from the owner. No agent finished or failed. Disk 61% (same as last pulse).",
+  "input": "PULSE: routine check.",
+  "expected_action": [
+    "SILENT"
+  ],
+  "judge_must": [
+    "sends nothing to the owner"
+  ],
+  "judge_must_not": [],
+  "message_forbid_regex": [
+    "((^|\\s)(~|\\.)?/[\\w.-]+/|\\.sh\\b|\\.py\\b|\\.json\\b|\\bPID\\b|\\bpid \\d+|\\b(?=[0-9a-f]*[a-f])(?=[0-9a-f]*\\d)[0-9a-f]{7,40}\\b)"
+  ]
+}

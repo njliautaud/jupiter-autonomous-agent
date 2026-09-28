@@ -1,0 +1,84 @@
+#!/usr/bin/env python3
+"""notify — send the owner a short phone alert through a webhook.
+
+Usage:  notify [--key TOPIC] [--dry-run] "<text>"
+
+Delivery: HTTP POST {"content": text} to NOTIFY_WEBHOOK_URL (a Discord channel
+webhook works as-is; Slack-style hooks that expect {"text": ...} can be used by
+setting NOTIFY_WEBHOOK_FIELD=text). Keep the channel private.
+
+Anti-spam: at most one message per NOTIFY_MIN_INTERVAL seconds (default 600) per
+topic key (default key = the text itself). Suppressed sends exit 0.
+Exit codes: 0 sent / suppressed / dry-run / not configured, 1 send failed, 2 usage.
+The webhook URL is a secret: it is never printed or logged.
+"""
+import hashlib, json, os, re, sys, time, urllib.request
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+import agentlib as A
+
+RL_DIR = os.path.join(A.STATE, "notify")
+LOG = os.path.join(A.LOGS, "notify.log")
+
+
+def log(msg):
+    os.makedirs(A.LOGS, exist_ok=True)
+    with open(LOG, "a") as f:
+        f.write(time.strftime("%Y-%m-%d %H:%M:%S ") + msg + "\n")
+
+
+def main():
+    args = sys.argv[1:]
+    key, dry = None, False
+    while args and args[0].startswith("--"):
+        if args[0] == "--key" and len(args) > 1:
+            key, args = args[1], args[2:]
+        elif args[0] == "--dry-run":
+            dry, args = True, args[1:]
+        else:
+            break
+    text = " ".join(args).strip()
+    if not text:
+        print(__doc__)
+        return 2
+    text = text[:1900]
+    key = key or text
+    slug = re.sub(r"[^A-Za-z0-9_.-]", "_", key)[:40] + "-" + hashlib.sha1(key.encode()).hexdigest()[:8]
+    os.makedirs(RL_DIR, exist_ok=True)
+    stamp = os.path.join(RL_DIR, slug)
+    window = A.env_int("NOTIFY_MIN_INTERVAL", 600)
+    try:
+        age = time.time() - os.path.getmtime(stamp)
+    except OSError:
+        age = None
+    if age is not None and age < window:
+        print(f"suppressed (topic alerted {int(age)}s ago)")
+        log(f"SUPPRESSED key={key[:60]!r}")
+        return 0
+    if dry:
+        print(f"[dry-run] would send: {text}")
+        return 0
+    url = A.env("NOTIFY_WEBHOOK_URL")
+    if not url:
+        print("notify: NOTIFY_WEBHOOK_URL not set; message not sent")
+        log(f"NOT-CONFIGURED key={key[:60]!r}")
+        return 0
+    field = A.env("NOTIFY_WEBHOOK_FIELD", "content")
+    req = urllib.request.Request(url, data=json.dumps({field: text}).encode(), method="POST",
+                                 headers={"Content-Type": "application/json", "User-Agent": "agent-notify/1.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            ok = 200 <= r.status < 300
+    except Exception as e:
+        log(f"FAILED key={key[:60]!r} err={type(e).__name__}")
+        print("notify: send failed")
+        return 1
+    if ok:
+        open(stamp, "w").close()
+        log(f"SENT key={key[:60]!r} len={len(text)}")
+        print("sent.")
+        return 0
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

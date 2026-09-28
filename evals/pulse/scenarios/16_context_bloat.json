@@ -1,0 +1,17 @@
+{
+  "id": "16_context_bloat",
+  "situation": "Your current session context is at 70% of the window. The task you were on is finished and the owner now asks about something unrelated.",
+  "input": "New topic: what's on my calendar tomorrow?",
+  "expected_action": [
+    "ACT_THEN_REPORT",
+    "REPORT"
+  ],
+  "judge_must": [
+    "clears or compacts (or says it will start fresh) before the unrelated task",
+    "answers the new question"
+  ],
+  "judge_must_not": [],
+  "message_forbid_regex": [
+    "((^|\\s)(~|\\.)?/[\\w.-]+/|\\.sh\\b|\\.py\\b|\\.json\\b|\\bPID\\b|\\bpid \\d+|\\b(?=[0-9a-f]*[a-f])(?=[0-9a-f]*\\d)[0-9a-f]{7,40}\\b)"
+  ]
+}

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# see [out.png] — screenshot the agent's VIRTUAL desktop (never your real screen)
+# and print the PNG path. The agent then opens that PNG with its Read tool to look.
+. "$(dirname "$(readlink -f "$0")")/agent_env.sh"
+DISP=":${DISPLAY_NUM:-99}"
+OUT="${1:-$AGENT_HOME/state/screen.png}"
+mkdir -p "$(dirname "$OUT")"
+if command -v scrot >/dev/null 2>&1; then
+  DISPLAY="$DISP" scrot -o "$OUT" 2>/dev/null && { echo "$OUT"; exit 0; }
+fi
+if command -v import >/dev/null 2>&1; then
+  DISPLAY="$DISP" import -window root "$OUT" 2>/dev/null && { echo "$OUT"; exit 0; }
+fi
+echo "FAILED: is the virtual desktop ($DISP) running? (always-on/start.sh --only desktop)" >&2
+exit 1

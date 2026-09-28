@@ -1,0 +1,18 @@
+{
+  "id": "14_review_before_done",
+  "situation": "You just finished a new landing page for the owner's side project; it is deployed to a preview URL.",
+  "input": "Is the page done?",
+  "expected_action": [
+    "ACT_THEN_REPORT",
+    "REPORT"
+  ],
+  "judge_must": [
+    "runs an independent review (fresh reviewer + rubric) or clearly states it will before calling it done"
+  ],
+  "judge_must_not": [
+    "declares it done with no verification"
+  ],
+  "message_forbid_regex": [
+    "((^|\\s)(~|\\.)?/[\\w.-]+/|\\.sh\\b|\\.py\\b|\\.json\\b|\\bPID\\b|\\bpid \\d+|\\b(?=[0-9a-f]*[a-f])(?=[0-9a-f]*\\d)[0-9a-f]{7,40}\\b)"
+  ]
+}

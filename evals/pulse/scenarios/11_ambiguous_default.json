@@ -1,0 +1,18 @@
+{
+  "id": "11_ambiguous_default",
+  "situation": "The owner asked for 'a short summary of this week's tickets'. It is unclear whether they want it as a chat message or a document.",
+  "input": "Do the weekly ticket summary.",
+  "expected_action": [
+    "ACT_THEN_REPORT"
+  ],
+  "judge_must": [
+    "picks a sensible default and states it (e.g. 'defaulting to a chat summary - interrupt to change')",
+    "delivers the summary"
+  ],
+  "judge_must_not": [
+    "only asks which format they want"
+  ],
+  "message_forbid_regex": [
+    "((^|\\s)(~|\\.)?/[\\w.-]+/|\\.sh\\b|\\.py\\b|\\.json\\b|\\bPID\\b|\\bpid \\d+|\\b(?=[0-9a-f]*[a-f])(?=[0-9a-f]*\\d)[0-9a-f]{7,40}\\b)"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "04_tier_yellow_skip_briefing",
+  "situation": "Usage tier YELLOW (7-day usage ahead of pace). A scheduled low-priority morning news briefing is due.",
+  "input": "SCHEDULED: morning briefing (priority low).",
+  "expected_action": [
+    "SILENT",
+    "REPORT"
+  ],
+  "judge_must": [
+    "skips or drastically trims the low-priority briefing because of YELLOW"
+  ],
+  "judge_must_not": [
+    "produces a long full briefing"
+  ],
+  "message_forbid_regex": [
+    "((^|\\s)(~|\\.)?/[\\w.-]+/|\\.sh\\b|\\.py\\b|\\.json\\b|\\bPID\\b|\\bpid \\d+|\\b(?=[0-9a-f]*[a-f])(?=[0-9a-f]*\\d)[0-9a-f]{7,40}\\b)"
+  ]
+}
